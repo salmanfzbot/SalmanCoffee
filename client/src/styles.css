@@ -1,0 +1,184 @@
+/* ===== THEME: colour variables (dark is the default; admin presets overwrite these from data.json) ===== */
+:root {
+  --bg: #0b0907;
+  --ink: #f4ead8;
+  --gold: #d9b15f;
+  --gold2: #f6dc98;
+  --muted: #9d8f7a;
+  --card: #16110c;
+  --line: #2d231a;
+  --serif: 'Cormorant Garamond', 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --arabic: 'Noto Naskh Arabic', 'Amiri', 'Traditional Arabic', 'Geeza Pro', serif;
+}
+/* ===================================================================================================== */
+
+* { box-sizing: border-box; }
+html { background: var(--bg); color-scheme: dark; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; padding: 0; }
+a { color: var(--gold); }
+[dir="rtl"] { font-family: var(--arabic); }
+.notice { padding: 40px; color: var(--muted); }
+
+/* ---------- top bar (thin) ---------- */
+.top {
+  position: fixed; inset-inline: 0; top: 0; z-index: 20; height: 52px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 0 clamp(16px, 3vw, 40px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(6px);
+}
+.brand { font-family: var(--serif); font-size: 19px; letter-spacing: .08em; color: var(--gold2); white-space: nowrap; }
+.links { display: flex; align-items: center; gap: clamp(10px, 2.2vw, 28px); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+.links button, .links a { color: var(--ink); text-decoration: none; opacity: .82; }
+.links button:hover, .links a:hover { opacity: 1; color: var(--gold2); }
+.links .lang { color: var(--gold); }
+
+/* ---------- hero: scroll-driven scenes ---------- */
+.hero { position: relative; }
+.stage { position: sticky; top: 0; height: 100vh; overflow: hidden; padding-top: 52px; }
+/* the fade lives on the scene's children, not the scene: an opacity on the scene would make a stacking context
+   that puts its text under the 3D layer. */
+.scene { position: absolute; inset: 0; pointer-events: none; }
+.scene > .art, .scene > .num, .scene > .copy { opacity: var(--op, 0); will-change: opacity; }
+.num {
+  position: absolute; z-index: 3; inset-inline-start: clamp(20px, 5vw, 80px); top: calc(52px + 7vh); text-shadow: 0 0 8px var(--bg), 0 0 3px var(--bg);
+  font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted);
+}
+.num b { display: block; font-family: var(--serif); font-weight: 500; font-size: 44px; color: var(--gold); letter-spacing: 0; line-height: 1; margin-bottom: 8px; }
+.num small { font-size: 14px; color: var(--muted); }
+.num span { display: block; }
+.copy {
+  position: absolute; z-index: 3; inset-inline-start: clamp(20px, 5vw, 80px); bottom: 21vh; width: min(44vw, 600px);
+  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  transform: translateY(calc(var(--lift, 0) * 28px));
+}
+.name {
+  font-family: var(--serif); font-weight: 500; line-height: .92;
+  font-size: clamp(56px, min(10vw, 13.5vh), 160px); color: var(--gold2); letter-spacing: -.01em;
+}
+.sub { font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.copy .d { margin: 4px 0 0; color: var(--ink); opacity: .78; line-height: 1.55; font-size: 15px; max-width: 360px; }
+.pr { font-family: var(--serif); color: var(--gold); font-size: 26px; }
+.pr small { font-family: var(--sans); font-size: 11px; letter-spacing: .2em; color: var(--muted); }
+
+/* the cup: photo or illustration, centred on the right; the burst parts leave from its centre */
+.art, .burst {
+  position: absolute; inset-inline-end: clamp(20px, 7vw, 120px); top: 50%;
+  width: min(44vw, 62vh); aspect-ratio: 1 / 1;
+  transform: translateY(calc(-50% + var(--lift, 0) * 70px));
+}
+.art { display: flex; align-items: center; justify-content: center; }
+.art .cupart svg, .cupart svg { width: 100%; height: 100%; display: block; }
+.art.photo .ph, .thumb .ph {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,.6);
+}
+.burst { pointer-events: none; }
+/* the 3D ingredient layer: a canvas three times the cup box, centred on it, so parts can fly past the photo */
+.burst-cv {
+  position: absolute; left: 50%; top: 50%; width: 300%; height: 300%;
+  transform: translate(-50%, -50%); display: block; pointer-events: none;
+}
+
+/* the table index: one row along the bottom of the hero (desktop). It sits below the copy block, which is
+   lifted by 19vh, so the title and the list never share a line. Hidden on phones and short screens. */
+.index {
+  position: absolute; inset-inline: 0; bottom: 0; padding: 44px clamp(20px, 5vw, 80px) 40px;
+  background: linear-gradient(to top, var(--bg) 62%, transparent);
+  z-index: 4; text-shadow: 0 0 8px var(--bg), 0 0 3px var(--bg); list-style: none; margin: 0; display: none; flex-wrap: wrap; align-items: baseline; gap: 6px 26px;
+  font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+}
+.index li { display: flex; gap: 8px; align-items: baseline; color: var(--muted); cursor: pointer; padding: 2px 0; white-space: nowrap; }
+.index li.on, .index li:hover { color: var(--gold2); }
+.index .ix { font-family: var(--serif); color: var(--gold); letter-spacing: 0; font-size: 15px; }
+.index .ix-h { color: var(--gold); font-family: var(--serif); font-size: 17px; letter-spacing: .04em; text-transform: none; cursor: default; }
+.index-hint { position: absolute; z-index: 4; bottom: 14px; inset-inline: 0; text-align: center; font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------- category bar ---------- */
+.catbar { position: sticky; top: 52px; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--line); }
+.catbar-in { display: flex; gap: 8px; overflow-x: auto; padding: 12px clamp(16px, 3vw, 40px); scrollbar-width: none; }
+.catbar-in::-webkit-scrollbar { display: none; }
+.chip { flex: none; padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; color: var(--ink); white-space: nowrap; }
+.chip:hover { border-color: var(--gold); color: var(--gold2); }
+
+/* ---------- menu grid ---------- */
+.menu { padding: 24px clamp(16px, 3vw, 40px) 40px; scroll-margin-top: 110px; }
+.cat { padding: 40px 0 16px; scroll-margin-top: 110px; }
+.cat-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 22px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+.cat-num { font-family: var(--serif); color: var(--gold); font-size: 22px; }
+.cat-title { margin: 0; font-family: var(--serif); font-weight: 500; font-size: clamp(34px, 4.6vw, 60px); color: var(--ink); line-height: 1; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+.card { background: var(--card); border: 1px solid var(--line); padding: 14px 14px 16px; display: flex; flex-direction: column; }
+.thumb { aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center; background: color-mix(in srgb, var(--card) 70%, var(--bg)); margin-bottom: 14px; overflow: hidden; }
+.thumb .ph { border-radius: 0; border: 0; box-shadow: none; }
+.thumb .cupart { width: 62%; height: 80%; }
+.nm { font-family: var(--serif); font-size: 27px; color: var(--gold2); line-height: 1.05; }
+.card .sub { position: static; font-size: 11px; color: var(--muted); letter-spacing: .14em; margin: 6px 0 8px; }
+.card .d { margin: 0 0 12px; font-size: 14px; line-height: 1.5; color: var(--ink); opacity: .75; }
+.card .pr { margin-top: auto; display: flex; justify-content: space-between; align-items: baseline; }
+.card .pr b { font-weight: 500; }
+.card .pr span { font-family: var(--sans); font-size: 11px; color: var(--muted); letter-spacing: .2em; }
+
+/* ---------- visit + footer ---------- */
+.visit { padding: 60px clamp(16px, 3vw, 40px); border-top: 1px solid var(--line); scroll-margin-top: 60px; }
+.visit-title { font-family: var(--serif); font-size: clamp(34px, 4vw, 52px); color: var(--gold2); margin-bottom: 24px; }
+.visit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px; }
+.visit-grid small { color: var(--gold); letter-spacing: .2em; text-transform: uppercase; font-size: 11px; }
+.visit-grid p { margin: 6px 0 0; line-height: 1.5; }
+.foot { padding: 22px clamp(16px, 3vw, 40px) 36px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.foot button { color: var(--gold); letter-spacing: .14em; text-transform: uppercase; font-size: 11px; }
+
+/* ---------- desktop hero text sizing and index ---------- */
+@media (min-width: 900px) { .index { display: flex; } .index-hint { display: none; } }
+@media (max-height: 700px) { .index { display: none; } }
+
+/* ---------- mobile (390) ---------- */
+@media (max-width: 760px) {
+  .top { height: 48px; }
+  .stage { padding-top: 48px; }
+  .links { gap: 12px; font-size: 10px; letter-spacing: .08em; }
+  .brand { font-size: 16px; }
+  .num { top: calc(48px + 3vh); font-size: 10px; }
+  .num b { font-size: 34px; }
+  .art, .burst { top: 36vh; inset-inline-end: 50%; transform: translate(50%, -50%) translateY(calc(var(--lift, 0) * 60px)); width: 70vw; }
+  .copy { bottom: 7vh; width: 88vw; gap: 6px; }
+  .name { font-size: clamp(44px, 14vw, 72px); }
+  .copy .d { font-size: 14px; }
+  .index-hint { bottom: 8px; }
+  .catbar { top: 48px; }
+  .grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .nm { font-size: 22px; }
+}
+
+/* ===================== ADMIN ===================== */
+.admin { min-height: 100vh; padding: 0 0 80px; background: var(--bg); color: var(--ink); font-size: 14px; }
+.admin.gate { display: grid; place-items: center; padding: 20px; }
+.gate-box { display: grid; gap: 14px; width: min(340px, 90vw); }
+.gate-box h1 { font-family: var(--serif); font-weight: 500; font-size: 28px; color: var(--gold2); margin: 0 0 8px; }
+.gate-box label, .colours label, .fields label { display: grid; gap: 6px; font-size: 12px; color: var(--muted); text-transform: capitalize; }
+.admin input, .admin select {
+  font: inherit; color: var(--ink); background: var(--card); border: 1px solid var(--line); padding: 8px 10px; border-radius: 4px; min-width: 0;
+}
+.admin input[type="color"] { width: 64px; height: 36px; padding: 2px; }
+.admin input:focus { outline: 1px solid var(--gold); }
+.btn { background: var(--gold); color: var(--bg); border: 0; padding: 10px 16px; border-radius: 4px; font-weight: 600; letter-spacing: .04em; }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); font-weight: 400; }
+.btn.small { padding: 6px 10px; font-size: 12px; }
+.admin-top { position: sticky; top: 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; padding: 14px clamp(16px, 3vw, 40px); background: var(--bg); border-bottom: 1px solid var(--line); font-size: 13px; }
+.admin-top b { font-family: var(--serif); font-weight: 500; font-size: 20px; color: var(--gold2); }
+.admin .panel { margin: 22px clamp(16px, 3vw, 40px); padding: 18px; background: var(--card); border: 1px solid var(--line); }
+.admin .panel h2 { font-family: var(--serif); font-weight: 500; font-size: 24px; color: var(--gold2); margin: 0 0 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+.cat-in { font-family: var(--serif) !important; font-size: 22px !important; background: transparent !important; border-color: transparent !important; padding: 2px 6px !important; width: min(280px, 100%); }
+.presets, .colours { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-bottom: 12px; }
+.fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.row { display: grid; grid-template-columns: 1.1fr 1.1fr 90px auto 1.6fr 1.6fr auto; gap: 8px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.row .price { width: 90px; }
+.feat { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+.savebar { position: sticky; bottom: 0; display: flex; gap: 16px; align-items: center; padding: 14px clamp(16px, 3vw, 40px); background: var(--bg); border-top: 1px solid var(--line); }
+.msg { color: var(--muted); font-size: 13px; }
+@media (max-width: 760px) { .row { grid-template-columns: 1fr 1fr; } .row .desc { grid-column: span 2; } }
